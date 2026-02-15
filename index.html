@@ -5,45 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Delta Exchange — Options Trading</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    /* ── Reset ─────────────────────────────────────── */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* ── Design Tokens ─────────────────────────────── */
     :root {
       --bg-base: #101013;
       --bg-surface: #1A1A1F;
       --bg-surface-alt: #141418;
       --bg-elevated: #1E1E24;
       --bg-header: #0D0D10;
-      --bg-input: #1C1C22;
-      --bg-row-hover: #1F1F26;
-      --bg-row-highlight: #252530;
+      --bg-row-hover: #1A1A22;
+      --bg-row-highlight: #1C1C28;
+      --bg-atm: #1E1A14;
+      --bg-itm-call: rgba(0, 210, 106, 0.04);
+      --bg-itm-put: rgba(255, 59, 59, 0.04);
 
       --text-primary: #FFFFFF;
       --text-secondary: #A0A0A8;
       --text-tertiary: #6B6B76;
+      --text-dim: #50505A;
 
       --accent: #2894F9;
-      --accent-hover: #3CA3FF;
       --accent-muted: rgba(40, 148, 249, 0.15);
 
       --buy: #00D26A;
-      --buy-hover: #00E87A;
       --buy-muted: rgba(0, 210, 106, 0.12);
       --sell: #FF3B3B;
-      --sell-hover: #FF5252;
       --sell-muted: rgba(255, 59, 59, 0.12);
 
       --border: #2A2A32;
-      --border-subtle: #222228;
+      --border-subtle: #1E1E26;
       --border-strong: #3A3A44;
 
       --warning: #FFB020;
 
       --font: "Roboto", "Helvetica", "Arial", sans-serif;
-      --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     body {
@@ -54,207 +52,242 @@
       line-height: 1.4;
       overflow: hidden;
       height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Top Header ────────────────────────────────── */
-    .header {
+    /* ── Top Nav ─────────────────────────────────── */
+    .top-nav {
       display: flex;
       align-items: center;
-      height: 44px;
+      height: 40px;
       background: var(--bg-header);
       border-bottom: 1px solid var(--border);
       padding: 0 16px;
-      gap: 24px;
+      gap: 16px;
     }
-    .header-logo {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: -0.02em;
-    }
-    .header-logo span { color: var(--text-primary); }
-    .header-nav { display: flex; gap: 20px; }
-    .header-nav a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 500;
-      transition: color var(--transition);
-    }
-    .header-nav a:hover, .header-nav a.active { color: var(--text-primary); }
-    .header-price {
-      margin-left: auto;
+    .nav-tab {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 13px;
-    }
-    .header-price .label { color: var(--text-tertiary); }
-    .header-price .value { font-weight: 600; color: var(--buy); font-variant-numeric: tabular-nums; }
-
-    /* ── Tab Bar ────────────────────────────────────── */
-    .tab-bar {
-      display: flex;
-      align-items: center;
-      height: 38px;
-      background: var(--bg-surface-alt);
-      border-bottom: 1px solid var(--border);
+      gap: 6px;
       padding: 0 12px;
-      gap: 4px;
-    }
-    .tab {
-      padding: 6px 14px;
+      height: 40px;
       font-size: 12px;
       font-weight: 500;
-      color: var(--text-secondary);
+      color: var(--text-tertiary);
       cursor: pointer;
-      border-radius: 4px;
+      border-bottom: 2px solid transparent;
       transition: all var(--transition);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
     }
-    .tab:hover { color: var(--text-primary); background: var(--bg-elevated); }
-    .tab.active { color: var(--accent); background: var(--accent-muted); }
-    .tab-divider { width: 1px; height: 18px; background: var(--border); margin: 0 8px; }
+    .nav-tab:hover { color: var(--text-secondary); }
+    .nav-tab.active { color: var(--text-primary); border-bottom-color: var(--accent); }
+    .nav-tab svg { width: 14px; height: 14px; fill: currentColor; opacity: 0.7; }
+    .nav-divider { width: 1px; height: 20px; background: var(--border); }
     .asset-toggle {
       display: flex;
-      background: var(--bg-base);
       border-radius: 4px;
       overflow: hidden;
       border: 1px solid var(--border);
     }
-    .asset-toggle .tab {
-      border-radius: 0;
-      padding: 5px 14px;
+    .asset-btn {
+      padding: 4px 16px;
       font-size: 12px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      background: transparent;
+      transition: all var(--transition);
+      font-family: var(--font);
+      border: none;
     }
-    .asset-toggle .tab.active { background: var(--accent); color: #fff; }
+    .asset-btn.active { background: var(--accent); color: #fff; }
+    .asset-btn:hover:not(.active) { color: var(--text-secondary); }
 
-    .date-tabs { display: flex; gap: 2px; }
+    .nav-tab-label { text-transform: none; letter-spacing: 0; }
+
+    /* ── Date Bar ────────────────────────────────── */
+    .date-bar {
+      display: flex;
+      align-items: center;
+      height: 32px;
+      background: var(--bg-surface-alt);
+      border-bottom: 1px solid var(--border);
+      padding: 0 12px;
+      gap: 2px;
+    }
     .date-tab {
-      padding: 5px 10px;
+      padding: 4px 10px;
       font-size: 11px;
       font-weight: 500;
       color: var(--text-tertiary);
       cursor: pointer;
       border-radius: 3px;
       transition: all var(--transition);
+      white-space: nowrap;
     }
     .date-tab:hover { color: var(--text-secondary); }
-    .date-tab.active {
-      background: var(--accent);
-      color: #fff;
+    .date-tab.active { background: var(--accent); color: #fff; }
+    .date-spacer { flex: 1; }
+    .date-nav {
+      display: flex;
+      gap: 4px;
+      margin-left: 8px;
     }
-    .tab-spacer { flex: 1; }
-    .expiry-info {
-      font-size: 11px;
+    .date-nav button {
+      width: 22px;
+      height: 22px;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: transparent;
       color: var(--text-tertiary);
-      margin-left: 12px;
+      cursor: pointer;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .expiry-info span { color: var(--warning); font-weight: 500; }
+    .date-nav button:hover { border-color: var(--text-tertiary); color: var(--text-secondary); }
 
-    /* ── Main Layout ───────────────────────────────── */
+    /* ── Main Layout ─────────────────────────────── */
     .main {
       display: flex;
-      height: calc(100vh - 82px);
+      height: calc(100vh - 72px);
     }
 
-    /* ── Left Panel: Option Chain ───────────────────── */
+    /* ── Option Chain (Left 50%) ─────────────────── */
     .panel-left {
-      width: 55%;
-      min-width: 600px;
+      width: 50%;
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    /* Option chain header row */
-    .oc-header {
+    .oc-info-bar {
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 8px 12px;
-      font-size: 13px;
+      height: 32px;
+      padding: 0 12px;
       background: var(--bg-surface-alt);
       border-bottom: 1px solid var(--border);
+      font-size: 12px;
       gap: 16px;
     }
-    .oc-header .side-label {
+    .oc-info-bar .side-label {
       font-weight: 600;
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.06em;
     }
-    .oc-header .side-label.calls { color: var(--buy); }
-    .oc-header .side-label.puts { color: var(--sell); }
-    .oc-header .btc-price { color: var(--buy); font-weight: 600; }
-    .oc-header .tte { color: var(--text-tertiary); font-size: 12px; }
+    .oc-info-bar .side-label.calls { color: var(--text-secondary); }
+    .oc-info-bar .side-label.puts { color: var(--text-secondary); margin-left: auto; }
+    .oc-info-bar .price-info { color: var(--text-secondary); }
+    .oc-info-bar .price-info .price { color: var(--buy); font-weight: 600; }
+    .oc-info-bar .tte { color: var(--text-tertiary); font-size: 11px; }
 
     /* Option chain table */
-    .oc-table-wrapper {
+    .oc-wrap {
       flex: 1;
       overflow-y: auto;
       overflow-x: hidden;
     }
-    .oc-table-wrapper::-webkit-scrollbar { width: 6px; }
-    .oc-table-wrapper::-webkit-scrollbar-track { background: var(--bg-base); }
-    .oc-table-wrapper::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+    .oc-wrap::-webkit-scrollbar { width: 5px; }
+    .oc-wrap::-webkit-scrollbar-track { background: transparent; }
+    .oc-wrap::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 
     .oc-table {
       width: 100%;
       border-collapse: collapse;
       font-variant-numeric: tabular-nums;
+      table-layout: fixed;
     }
+    .oc-table thead { position: sticky; top: 0; z-index: 3; }
     .oc-table th {
-      position: sticky;
-      top: 0;
       background: var(--bg-surface-alt);
       color: var(--text-tertiary);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      padding: 6px 8px;
+      padding: 4px 6px 2px;
       border-bottom: 1px solid var(--border);
       white-space: nowrap;
-      z-index: 2;
+      vertical-align: bottom;
     }
-    .oc-table th.strike-header {
+    .oc-table th .sub {
+      display: block;
+      font-size: 9px;
+      font-weight: 400;
+      color: var(--text-dim);
+      text-transform: none;
+      letter-spacing: 0;
+      margin-top: 1px;
+    }
+    .oc-table th.strike-th {
       background: var(--bg-elevated);
       color: var(--text-secondary);
+      text-align: center;
     }
+    .oc-table th.call-th { text-align: right; }
+    .oc-table th.put-th { text-align: left; }
+    .oc-table th.oi-th { text-align: right; }
+    .oc-table th.oi-th-put { text-align: left; }
+
     .oc-table td {
-      padding: 5px 8px;
+      padding: 3px 6px;
       font-size: 12px;
       border-bottom: 1px solid var(--border-subtle);
       white-space: nowrap;
+      vertical-align: middle;
+      line-height: 1.3;
     }
-    .oc-table tr:hover td { background: var(--bg-row-hover); }
-    .oc-table tr.atm td { background: var(--bg-row-highlight); }
-    .oc-table tr.atm td.strike-cell {
-      background: var(--accent-muted);
-      font-weight: 700;
-      color: var(--accent);
-    }
+    .oc-table tr:hover td { background: var(--bg-row-hover) !important; }
+
+    /* Cell types */
+    .oc-table .c-r { text-align: right; }
+    .oc-table .c-l { text-align: left; }
+    .oc-table .c-c { text-align: center; }
 
     .oc-table .strike-cell {
       text-align: center;
       font-weight: 600;
+      font-size: 12px;
       color: var(--text-primary);
       background: var(--bg-surface-alt);
       border-left: 1px solid var(--border);
       border-right: 1px solid var(--border);
-      min-width: 70px;
     }
-    .oc-table .call-cell { text-align: right; }
-    .oc-table .put-cell { text-align: left; }
-    .oc-table .oi-cell { color: var(--text-tertiary); }
-    .green { color: var(--buy); }
-    .red { color: var(--sell); }
-    .muted { color: var(--text-tertiary); }
 
-    /* ── Right Panel ───────────────────────────────── */
+    /* Price + IV dual-line cell */
+    .price-line {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-primary);
+    }
+    .iv-line {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 0px;
+    }
+    .ask-price .price-line { color: var(--buy); }
+    .bid-price-put .price-line { color: var(--buy); }
+    .ask-price-put .price-line { color: var(--sell); }
+
+    .oi-val { color: var(--text-tertiary); font-size: 11px; }
+    .qty-val { color: var(--text-secondary); font-size: 12px; }
+
+    /* ATM row */
+    .oc-table tr.atm td { background: var(--bg-atm); }
+    .oc-table tr.atm td.strike-cell {
+      background: var(--accent-muted);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ITM shading */
+    .oc-table tr.itm-call td.call-side { background: var(--bg-itm-call); }
+    .oc-table tr.itm-put td.put-side { background: var(--bg-itm-put); }
+
+    /* ── Right Panel ─────────────────────────────── */
     .panel-right {
       flex: 1;
       display: flex;
@@ -274,12 +307,13 @@
       display: flex;
       align-items: center;
       padding: 6px 12px;
-      gap: 12px;
+      gap: 10px;
       background: var(--bg-surface-alt);
       border-bottom: 1px solid var(--border);
+      height: 34px;
     }
     .chart-toolbar .pair {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text-primary);
     }
@@ -298,12 +332,12 @@
       position: relative;
       background: var(--bg-base);
     }
-    .chart-area canvas { width: 100%; height: 100%; }
+    .chart-area canvas { display: block; }
 
     /* Positions */
     .positions-panel {
-      height: 40%;
-      min-height: 180px;
+      height: 38%;
+      min-height: 160px;
       display: flex;
       flex-direction: column;
     }
@@ -311,16 +345,16 @@
       display: flex;
       align-items: center;
       padding: 0 12px;
-      height: 36px;
+      height: 34px;
       background: var(--bg-surface-alt);
       border-bottom: 1px solid var(--border);
-      gap: 4px;
+      gap: 2px;
     }
     .pos-tab {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
       color: var(--text-tertiary);
-      padding: 6px 12px;
+      padding: 5px 10px;
       cursor: pointer;
       border-radius: 4px;
       transition: all var(--transition);
@@ -331,20 +365,21 @@
       display: inline-block;
       background: var(--accent);
       color: #fff;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 600;
       padding: 1px 5px;
       border-radius: 8px;
-      margin-left: 4px;
+      margin-left: 3px;
+      vertical-align: 1px;
     }
 
-    .positions-table-wrapper {
+    .positions-wrap {
       flex: 1;
       overflow-y: auto;
     }
-    .positions-table-wrapper::-webkit-scrollbar { width: 6px; }
-    .positions-table-wrapper::-webkit-scrollbar-track { background: var(--bg-base); }
-    .positions-table-wrapper::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+    .positions-wrap::-webkit-scrollbar { width: 5px; }
+    .positions-wrap::-webkit-scrollbar-track { background: transparent; }
+    .positions-wrap::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 
     .pos-table {
       width: 100%;
@@ -356,7 +391,7 @@
       top: 0;
       background: var(--bg-surface-alt);
       color: var(--text-tertiary);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.04em;
@@ -374,11 +409,13 @@
     .pos-table tr:hover td { background: var(--bg-row-hover); }
     .side-long { color: var(--buy); font-weight: 600; }
     .side-short { color: var(--sell); font-weight: 600; }
+    .green { color: var(--buy); }
+    .red { color: var(--sell); }
     .btn-close {
       background: transparent;
       border: 1px solid var(--sell);
       color: var(--sell);
-      font-size: 11px;
+      font-size: 10px;
       padding: 2px 10px;
       border-radius: 3px;
       cursor: pointer;
@@ -390,68 +427,66 @@
 </head>
 <body>
 
-  <!-- ── Header ──────────────────────────────────── -->
-  <div class="header">
-    <div class="header-logo"><span>delta</span>.exchange</div>
-    <div class="header-nav">
-      <a href="#" class="active">Options</a>
-      <a href="#">Futures</a>
-      <a href="#">Spreads</a>
-      <a href="#">Move</a>
+  <!-- Top Nav -->
+  <div class="top-nav">
+    <div class="nav-tab active">
+      <svg viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+      <span class="nav-tab-label">Option Chain</span>
     </div>
-    <div class="header-price">
-      <span class="label">BTC</span>
-      <span class="value">$70,225.6</span>
+    <div class="nav-tab">
+      <svg viewBox="0 0 16 16"><polyline points="1,12 4,5 7,8 10,3 14,7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span class="nav-tab-label">Chart</span>
     </div>
-  </div>
-
-  <!-- ── Tab Bar ─────────────────────────────────── -->
-  <div class="tab-bar">
+    <div class="nav-divider"></div>
     <div class="asset-toggle">
-      <div class="tab active">BTC</div>
-      <div class="tab">ETH</div>
+      <button class="asset-btn active">BTC</button>
+      <button class="asset-btn">ETH</button>
     </div>
-    <div class="tab-divider"></div>
-    <div class="date-tabs">
-      <div class="date-tab">16 Feb</div>
-      <div class="date-tab">17 Feb</div>
-      <div class="date-tab">18 Feb</div>
-      <div class="date-tab">20 Feb</div>
-      <div class="date-tab active">27 Feb</div>
-      <div class="date-tab">06 Mar</div>
-      <div class="date-tab">27 Mar</div>
-      <div class="date-tab">24 Apr</div>
-    </div>
-    <div class="tab-spacer"></div>
-    <div class="expiry-info">Expires in <span>11d 23h 49m</span></div>
   </div>
 
-  <!-- ── Main Layout ─────────────────────────────── -->
+  <!-- Date Bar -->
+  <div class="date-bar">
+    <div class="date-tab">16 Feb 26</div>
+    <div class="date-tab">17 Feb 26</div>
+    <div class="date-tab">18 Feb 26</div>
+    <div class="date-tab">20 Feb 26</div>
+    <div class="date-tab active">27 Feb 26</div>
+    <div class="date-tab">06 Mar 26</div>
+    <div class="date-tab">27 Mar 26</div>
+    <div class="date-tab">24 Apr 26</div>
+    <div class="date-spacer"></div>
+    <div class="date-nav">
+      <button>&lsaquo;</button>
+      <button>&rsaquo;</button>
+    </div>
+  </div>
+
+  <!-- Main -->
   <div class="main">
 
-    <!-- Left: Option Chain -->
+    <!-- Left: Option Chain 50% -->
     <div class="panel-left">
-      <div class="oc-header">
+      <div class="oc-info-bar">
         <span class="side-label calls">Calls</span>
-        <span>BTC <span class="btc-price">$70,225.6</span></span>
-        <span class="tte">Time to Expiry 11d:23h:49m</span>
+        <span class="price-info">BTC <span class="price">$70,320.9</span></span>
+        <span class="tte">Time to Expiry <strong style="color:var(--text-secondary)">11d:23h:35m</strong></span>
         <span class="side-label puts">Puts</span>
       </div>
-      <div class="oc-table-wrapper">
+      <div class="oc-wrap">
         <table class="oc-table">
           <thead>
             <tr>
-              <th class="call-cell">Bid</th>
-              <th class="call-cell">Mark</th>
-              <th class="call-cell">Ask</th>
-              <th class="call-cell">Ask Qty</th>
-              <th class="call-cell oi-cell">OI</th>
-              <th class="strike-header">Strike</th>
-              <th class="put-cell oi-cell">OI</th>
-              <th class="put-cell">Bid Qty</th>
-              <th class="put-cell">Bid</th>
-              <th class="put-cell">Mark</th>
-              <th class="put-cell">Ask</th>
+              <th class="call-th">Bid<span class="sub">(Price / IV)</span></th>
+              <th class="call-th">Mark<span class="sub">(Price / IV)</span></th>
+              <th class="call-th">Ask<span class="sub">(Price / IV)</span></th>
+              <th class="call-th">Ask Qty<span class="sub">BTC</span></th>
+              <th class="oi-th">OI</th>
+              <th class="strike-th">Strike &#x25BC;</th>
+              <th class="oi-th-put">OI</th>
+              <th class="put-th">Bid Qty<span class="sub">BTC</span></th>
+              <th class="put-th">Bid<span class="sub">(Price / IV)</span></th>
+              <th class="put-th">Mark<span class="sub">(Price / IV)</span></th>
+              <th class="put-th">Ask<span class="sub">(Price / IV)</span></th>
             </tr>
           </thead>
           <tbody id="oc-body"></tbody>
@@ -459,10 +494,8 @@
       </div>
     </div>
 
-    <!-- Right: Chart + Positions -->
+    <!-- Right: Chart + Positions 50% -->
     <div class="panel-right">
-
-      <!-- Chart -->
       <div class="chart-panel">
         <div class="chart-toolbar">
           <span class="pair">BTC-27FEB26-70000-C</span>
@@ -478,7 +511,6 @@
         </div>
       </div>
 
-      <!-- Positions -->
       <div class="positions-panel">
         <div class="positions-tabs">
           <div class="pos-tab active">Positions <span class="count">3</span></div>
@@ -486,7 +518,7 @@
           <div class="pos-tab">Order History</div>
           <div class="pos-tab">Trade History</div>
         </div>
-        <div class="positions-table-wrapper">
+        <div class="positions-wrap">
           <table class="pos-table">
             <thead>
               <tr>
@@ -505,58 +537,70 @@
           </table>
         </div>
       </div>
-
     </div>
+
   </div>
 
   <script>
-    /* ── Option Chain Data ────────────────────────── */
+    /* ── Option Chain Data (matching screenshot) ── */
+    const spotPrice = 70320.9;
     const strikes = [
-      { strike: 66500, cBid: 4836, cMark: 4869.3, cAsk: 4006, cAskQty: 4.946, cOI: '$49.86K', pOI: '$52.78K', pBidQty: 7.330, pBid: 1020.8, pMark: 1034.9, pAsk: 1053.0 },
-      { strike: 67000, cBid: 4465, cMark: 4496.6, cAsk: 4532, cAskQty: 5.203, cOI: '$338.47K', pOI: '$537.58K', pBidQty: 7.872, pBid: 1144.6, pMark: 1161.0, pAsk: 1178.0 },
-      { strike: 67500, cBid: 4102, cMark: 4134.3, cAsk: 4160, cAskQty: 4.956, cOI: '$48.59K', pOI: '$72.81K', pBidQty: 7.330, pBid: 1274.0, pMark: 1298.1, pAsk: 1317.0 },
-      { strike: 68000, cBid: 3758, cMark: 3787.3, cAsk: 3817, cAskQty: 4.897, cOI: '$108.08K', pOI: '$326.42K', pBidQty: 7.368, pBid: 1422.6, pMark: 1449.9, pAsk: 1475.0 },
-      { strike: 68500, cBid: 3428, cMark: 3455.3, cAsk: 3484, cAskQty: 4.937, cOI: '$124.15K', pOI: '$91.07K', pBidQty: 7.330, pBid: 1599.3, pMark: 1617.1, pAsk: 1642.0 },
-      { strike: 69000, cBid: 3117, cMark: 3140.2, cAsk: 3168, cAskQty: 5.051, cOI: '$278.72K', pOI: '$299.84K', pBidQty: 7.330, pBid: 1783.0, pMark: 1801.4, pAsk: 1822.0 },
-      { strike: 69500, cBid: 2824, cMark: 2843.6, cAsk: 2864, cAskQty: 4.887, cOI: '$175.79K', pOI: '$287.38K', pBidQty: 7.520, pBid: 1984.0, pMark: 2004.3, pAsk: 2026.0 },
-      { strike: 70000, cBid: 2542, cMark: 2563.3, cAsk: 2582, cAskQty: 5.047, cOI: '$278.42K', pOI: '$978.05K', pBidQty: 7.330, pBid: 2204.0, pMark: 2222.9, pAsk: 2244.0, atm: true },
-      { strike: 70500, cBid: 2292, cMark: 2302.4, cAsk: 2322, cAskQty: 4.887, cOI: '$55.97K', pOI: '$63.52K', pBidQty: 7.410, pBid: 2441.1, pMark: 2461.3, pAsk: 2481.0 },
-      { strike: 71000, cBid: 2038, cMark: 2057.8, cAsk: 2078, cAskQty: 5.238, cOI: '$325.15K', pOI: '$234.03K', pBidQty: 7.443, pBid: 2698.0, pMark: 2716.1, pAsk: 2738.0 },
-      { strike: 71500, cBid: 1810, cMark: 1829.4, cAsk: 1850, cAskQty: 4.987, cOI: '$162.33K', pOI: '$4.00K', pBidQty: 7.330, pBid: 2967.0, pMark: 2987.3, pAsk: 3007.0 },
-      { strike: 72000, cBid: 1604, cMark: 1623.1, cAsk: 1642, cAskQty: 6.101, cOI: '$331.13K', pOI: '$19.68K', pBidQty: 7.330, pBid: 3256.0, pMark: 3280.4, pAsk: 3300.0 },
-      { strike: 72500, cBid: 1410, cMark: 1428.5, cAsk: 1448, cAskQty: 5.110, cOI: '$92.14K', pOI: '$8.20K', pBidQty: 7.330, pBid: 3562.0, pMark: 3584.7, pAsk: 3607.0 },
-      { strike: 73000, cBid: 1236, cMark: 1254.8, cAsk: 1274, cAskQty: 4.921, cOI: '$184.50K', pOI: '$56.43K', pBidQty: 7.330, pBid: 3886.0, pMark: 3910.1, pAsk: 3932.0 },
-      { strike: 73500, cBid: 1078, cMark: 1096.3, cAsk: 1116, cAskQty: 5.340, cOI: '$67.22K', pOI: '$12.50K', pBidQty: 7.110, pBid: 4225.0, pMark: 4250.8, pAsk: 4274.0 },
-      { strike: 74000, cBid: 938, cMark: 955.6, cAsk: 974, cAskQty: 4.770, cOI: '$143.88K', pOI: '$31.70K', pBidQty: 7.330, pBid: 4582.0, pMark: 4609.3, pAsk: 4632.0 },
+      { strike: 66500, cBid: 4919.0, cBidIV: '53.3%', cMark: 4956.1, cMarkIV: '53.7%', cAsk: 4990.0, cAskIV: '53.3%', cAskQty: 4.939, cOI: '$49.82K', pOI: '$52.68K', pBidQty: 7.319, pBid: 1026.2, pBidIV: '50.2%', pMark: 1042.0, pMarkIV: '50.5%', pAsk: 1060.0, pAskIV: '4.8' },
+      { strike: 67000, cBid: 4647.0, cBidIV: '51.4%', cMark: 4579.4, cMarkIV: '52.2%', cAsk: 4614.0, cAskIV: '50.9%', cAskQty: 5.196, cOI: '$339.12K', pOI: '$538.26K', pBidQty: 7.880, pBid: 1132.0, pBidIV: '49.5%', pMark: 1148.5, pMarkIV: '49.8%', pAsk: 1106.0, pAskIV: '4.8' },
+      { strike: 67500, cBid: 4183.0, cBidIV: '50.7%', cMark: 4215.4, cMarkIV: '51.5%', cAsk: 4247.0, cAskIV: '50.2%', cAskQty: 4.948, cOI: '$48.67K', pOI: '$72.54K', pBidQty: 7.319, pBid: 1266.0, pBidIV: '49.0%', pMark: 1283.3, pMarkIV: '49.3%', pAsk: 1301.0, pAskIV: '4.9' },
+      { strike: 68000, cBid: 3820.0, cBidIV: '49.5%', cMark: 3863.8, cMarkIV: '50.8%', cAsk: 3886.0, cAskIV: '49.4%', cAskQty: 4.880, cOI: '$108.29K', pOI: '$326.81K', pBidQty: 7.357, pBid: 1411.0, pBidIV: '47.9%', pMark: 1429.9, pMarkIV: '48.2%', pAsk: 1448.0, pAskIV: '4.8' },
+      { strike: 68500, cBid: 3500.0, cBidIV: '48.5%', cMark: 3527.7, cMarkIV: '49.5%', cAsk: 3556.0, cAskIV: '48.6%', cAskQty: 4.939, cOI: '$124.18K', pOI: '$91.19K', pBidQty: 7.319, pBid: 1577.0, pBidIV: '47.1%', pMark: 1594.7, pMarkIV: '47.4%', pAsk: 1614.0, pAskIV: '4.3' },
+      { strike: 69000, cBid: 3184.0, cBidIV: '47.2%', cMark: 3210.5, cMarkIV: '48.3%', cAsk: 3236.0, cAskIV: '47.4%', cAskQty: 5.045, cOI: '$279.88K', pOI: '$299.95K', pBidQty: 7.318, pBid: 1775.0, pBidIV: '46.5%', pMark: 1794.0, pMarkIV: '46.4%', pAsk: 1814.0, pAskIV: '4.4' },
+      { strike: 69500, cBid: 2889.0, cBidIV: '46.1%', cMark: 2907.5, cMarkIV: '46.7%', cAsk: 2932.0, cAskIV: '46.3%', cAskQty: 4.879, cOI: '$176.09K', pOI: '$287.54K', pBidQty: 7.508, pBid: 1972.0, pBidIV: '46.7%', pMark: 1993.0, pMarkIV: '46.7%', pAsk: 2014.0, pAskIV: '4.4' },
+      { strike: 70000, cBid: 2602.0, cBidIV: '46.1%', cMark: 2621.4, cMarkIV: '46.2%', cAsk: 2642.0, cAskIV: '45.5%', cAskQty: 5.040, cOI: '$278.74K', pOI: '$981.79K', pBidQty: 7.318, pBid: 2186.0, pBidIV: '46.7%', pMark: 2206.0, pMarkIV: '46.7%', pAsk: 2228.0, pAskIV: '4.8', atm: true },
+      { strike: 70500, cBid: 2329.0, cBidIV: '46.3%', cMark: 2354.9, cMarkIV: '46.5%', cAsk: 2380.0, cAskIV: '46.3%', cAskQty: 4.880, cOI: '$55.99K', pOI: '$54.09K', pBidQty: 7.318, pBid: 2390.0, pBidIV: '46.0%', pMark: 2417.3, pMarkIV: '46.3%', pAsk: 2436.0, pAskIV: '4.8' },
+      { strike: 71000, cBid: 2085.0, cBidIV: '47.2%', cMark: 2104.9, cMarkIV: '47.0%', cAsk: 2125.0, cAskIV: '48.6%', cAskQty: 5.230, cOI: '$325.65K', pOI: '$234.35K', pBidQty: 7.432, pBid: 2648.0, pBidIV: '47.0%', pMark: 2667.4, pMarkIV: '47.2%', pAsk: 2688.0, pAskIV: '4.8' },
+      { strike: 71500, cBid: 1852.0, cBidIV: '46.9%', cMark: 1872.6, cMarkIV: '47.2%', cAsk: 1892.0, cAskIV: '47.0%', cAskQty: 4.879, cOI: '$162.21K', pOI: '$3.92K', pBidQty: 7.319, pBid: 2913.0, pBidIV: '46.8%', pMark: 2934.0, pMarkIV: '47.1%', pAsk: 2962.0, pAskIV: '4.8' },
+      { strike: 72000, cBid: 1645.0, cBidIV: '48.5%', cMark: 1663.3, cMarkIV: '48.4%', cAsk: 1681.0, cAskIV: '48.3%', cAskQty: 5.094, cOI: '$331.71K', pOI: '$258.53K', pBidQty: 7.319, pBid: 3200.0, pBidIV: '47.7%', pMark: 3224.8, pMarkIV: '48.0%', pAsk: 3245.0, pAskIV: '8.9' },
+      { strike: 72500, cBid: 1448.0, cBidIV: '49.1%', cMark: 1465.2, cMarkIV: '49.0%', cAsk: 1484.0, cAskIV: '49.2%', cAskQty: 4.870, cOI: '$92.30K', pOI: '$8.41K', pBidQty: 7.319, pBid: 3508.0, pBidIV: '48.5%', pMark: 3526.1, pMarkIV: '48.8%', pAsk: 3550.0, pAskIV: '8.4' },
+      { strike: 73000, cBid: 1268.0, cBidIV: '49.8%', cMark: 1284.5, cMarkIV: '49.7%', cAsk: 1302.0, cAskIV: '49.9%', cAskQty: 5.110, cOI: '$184.92K', pOI: '$56.70K', pBidQty: 7.319, pBid: 3820.0, pBidIV: '49.2%', pMark: 3845.3, pMarkIV: '49.5%', pAsk: 3868.0, pAskIV: '8.6' },
+      { strike: 73500, cBid: 1104.0, cBidIV: '50.3%', cMark: 1120.1, cMarkIV: '50.2%', cAsk: 1138.0, cAskIV: '50.5%', cAskQty: 4.930, cOI: '$67.55K', pOI: '$12.80K', pBidQty: 7.100, pBid: 4155.0, pBidIV: '49.8%', pMark: 4180.6, pMarkIV: '50.1%', pAsk: 4200.0, pAskIV: '8.2' },
+      { strike: 74000, cBid: 958.0, cBidIV: '51.0%', cMark: 974.8, cMarkIV: '50.9%', cAsk: 992.0, cAskIV: '51.2%', cAskQty: 4.780, cOI: '$144.10K', pOI: '$32.00K', pBidQty: 7.319, pBid: 4506.0, pBidIV: '50.3%', pMark: 4534.2, pMarkIV: '50.6%', pAsk: 4558.0, pAskIV: '8.4' },
+      { strike: 74500, cBid: 826.0, cBidIV: '51.6%', cMark: 842.3, cMarkIV: '51.5%', cAsk: 860.0, cAskIV: '51.8%', cAskQty: 5.020, cOI: '$38.40K', pOI: '$5.60K', pBidQty: 7.200, pBid: 4872.0, pBidIV: '51.0%', pMark: 4900.8, pMarkIV: '51.3%', pAsk: 4924.0, pAskIV: '8.1' },
+      { strike: 75000, cBid: 710.0, cBidIV: '52.1%', cMark: 725.6, cMarkIV: '52.0%', cAsk: 742.0, cAskIV: '52.3%', cAskQty: 4.650, cOI: '$210.80K', pOI: '$18.90K', pBidQty: 7.319, pBid: 5254.0, pBidIV: '51.5%', pMark: 5282.4, pMarkIV: '51.8%', pAsk: 5308.0, pAskIV: '8.6' },
     ];
 
     const tbody = document.getElementById('oc-body');
+
     strikes.forEach(s => {
       const tr = document.createElement('tr');
       if (s.atm) tr.classList.add('atm');
+
+      const isITMCall = s.strike < spotPrice;
+      const isITMPut = s.strike > spotPrice;
+      if (isITMCall) tr.classList.add('itm-call');
+      if (isITMPut) tr.classList.add('itm-put');
+
       tr.innerHTML = `
-        <td class="call-cell">${fmt(s.cBid)}</td>
-        <td class="call-cell muted">${fmt(s.cMark)}</td>
-        <td class="call-cell green">${fmt(s.cAsk)}</td>
-        <td class="call-cell">${s.cAskQty.toFixed(3)}</td>
-        <td class="call-cell oi-cell">${s.cOI}</td>
+        <td class="c-r call-side"><div class="price-line">${fmtP(s.cBid)}</div><div class="iv-line">${s.cBidIV}</div></td>
+        <td class="c-r call-side"><div class="price-line" style="color:var(--text-tertiary)">${fmtP(s.cMark)}</div><div class="iv-line">${s.cMarkIV}</div></td>
+        <td class="c-r call-side ask-price"><div class="price-line">${fmtP(s.cAsk)}</div><div class="iv-line">${s.cAskIV}</div></td>
+        <td class="c-r call-side"><span class="qty-val">${s.cAskQty.toFixed(3)}</span></td>
+        <td class="c-r call-side"><span class="oi-val">${s.cOI}</span></td>
         <td class="strike-cell">${s.strike.toLocaleString()}</td>
-        <td class="put-cell oi-cell">${s.pOI}</td>
-        <td class="put-cell">${s.pBidQty.toFixed(3)}</td>
-        <td class="put-cell green">${fmt(s.pBid)}</td>
-        <td class="put-cell muted">${fmt(s.pMark)}</td>
-        <td class="put-cell red">${fmt(s.pAsk)}</td>
+        <td class="c-l put-side"><span class="oi-val">${s.pOI}</span></td>
+        <td class="c-l put-side"><span class="qty-val">${s.pBidQty.toFixed(3)}</span></td>
+        <td class="c-l put-side bid-price-put"><div class="price-line">${fmtP(s.pBid)}</div><div class="iv-line">${s.pBidIV}</div></td>
+        <td class="c-l put-side"><div class="price-line" style="color:var(--text-tertiary)">${fmtP(s.pMark)}</div><div class="iv-line">${s.pMarkIV}</div></td>
+        <td class="c-l put-side ask-price-put"><div class="price-line">${fmtP(s.pAsk)}</div><div class="iv-line">${s.pAskIV}</div></td>
       `;
       tbody.appendChild(tr);
     });
 
-    function fmt(v) { return '$' + v.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+    function fmtP(v) {
+      return '$' + v.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    }
 
-    /* ── Positions Data ──────────────────────────── */
+    /* ── Positions ───────────────────────────────── */
     const positions = [
-      { contract: 'BTC-27FEB26-70000-C', side: 'Long', size: '0.50 BTC', entry: '$2,480.0', mark: '$2,563.3', liq: '—', pnl: '+$41.65', roe: '+3.36%', pnlClass: 'green' },
-      { contract: 'BTC-27FEB26-68000-P', side: 'Short', size: '1.00 BTC', entry: '$1,510.0', mark: '$1,449.9', liq: '—', pnl: '+$60.10', roe: '+3.98%', pnlClass: 'green' },
-      { contract: 'BTC-27FEB26-72000-C', side: 'Long', size: '0.25 BTC', entry: '$1,680.0', mark: '$1,623.1', liq: '—', pnl: '-$14.23', roe: '-3.39%', pnlClass: 'red' },
+      { contract: 'BTC-27FEB26-70000-C', side: 'Long', size: '0.50 BTC', entry: '$2,480.0', mark: '$2,621.4', liq: '—', pnl: '+$70.70', roe: '+5.70%', cls: 'green' },
+      { contract: 'BTC-27FEB26-68000-P', side: 'Short', size: '1.00 BTC', entry: '$1,510.0', mark: '$1,429.9', liq: '—', pnl: '+$80.10', roe: '+5.30%', cls: 'green' },
+      { contract: 'BTC-27FEB26-72000-C', side: 'Long', size: '0.25 BTC', entry: '$1,680.0', mark: '$1,663.3', liq: '—', pnl: '-$4.18', roe: '-0.99%', cls: 'red' },
     ];
 
     const posBody = document.getElementById('pos-body');
@@ -569,144 +613,113 @@
         <td>${p.entry}</td>
         <td>${p.mark}</td>
         <td>${p.liq}</td>
-        <td class="${p.pnlClass}">${p.pnl}</td>
-        <td class="${p.pnlClass}">${p.roe}</td>
+        <td class="${p.cls}">${p.pnl}</td>
+        <td class="${p.cls}">${p.roe}</td>
         <td><button class="btn-close">Close</button></td>
       `;
       posBody.appendChild(tr);
     });
 
-    /* ── Chart (candlestick mock) ────────────────── */
+    /* ── Chart ───────────────────────────────────── */
     function drawChart() {
       const canvas = document.getElementById('chart-canvas');
       const container = canvas.parentElement;
-      canvas.width = container.clientWidth * 2;
-      canvas.height = container.clientHeight * 2;
-      canvas.style.width = container.clientWidth + 'px';
-      canvas.style.height = container.clientHeight + 'px';
-      const ctx = canvas.getContext('2d');
-      ctx.scale(2, 2);
+      const dpr = window.devicePixelRatio || 1;
       const W = container.clientWidth;
       const H = container.clientHeight;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
 
-      // Background
       ctx.fillStyle = '#101013';
       ctx.fillRect(0, 0, W, H);
 
       // Grid
       ctx.strokeStyle = 'rgba(255,255,255,0.04)';
       ctx.lineWidth = 0.5;
-      for (let y = 40; y < H - 20; y += 40) {
-        ctx.beginPath(); ctx.moveTo(50, y); ctx.lineTo(W - 10, y); ctx.stroke();
+      for (let y = 30; y < H - 20; y += 35) {
+        ctx.beginPath(); ctx.moveTo(45, y); ctx.lineTo(W - 50, y); ctx.stroke();
       }
-      for (let x = 50; x < W - 10; x += 60) {
+      for (let x = 45; x < W - 50; x += 50) {
         ctx.beginPath(); ctx.moveTo(x, 10); ctx.lineTo(x, H - 20); ctx.stroke();
       }
 
-      // Generate candle data
+      // Candles
       const candles = [];
-      let price = 2500;
-      const count = Math.floor((W - 80) / 10);
+      let price = 2550;
+      const count = Math.floor((W - 110) / 8);
       for (let i = 0; i < count; i++) {
-        const open = price;
-        const change = (Math.random() - 0.48) * 80;
-        const close = open + change;
-        const high = Math.max(open, close) + Math.random() * 40;
-        const low = Math.min(open, close) - Math.random() * 40;
-        candles.push({ open, close, high, low });
-        price = close;
+        const o = price;
+        const c = o + (Math.random() - 0.48) * 60;
+        const h = Math.max(o, c) + Math.random() * 30;
+        const l = Math.min(o, c) - Math.random() * 30;
+        candles.push({ o, c, h, l });
+        price = c;
       }
 
-      const allPrices = candles.flatMap(c => [c.high, c.low]);
-      const minP = Math.min(...allPrices);
-      const maxP = Math.max(...allPrices);
-      const chartTop = 20;
-      const chartBottom = H - 30;
-      const chartH = chartBottom - chartTop;
+      const all = candles.flatMap(c => [c.h, c.l]);
+      const mn = Math.min(...all), mx = Math.max(...all);
+      const cT = 15, cB = H - 25, cH = cB - cT;
+      const yP = p => cT + (1 - (p - mn) / (mx - mn)) * cH;
 
-      function yPos(p) { return chartTop + (1 - (p - minP) / (maxP - minP)) * chartH; }
-
-      // Draw candles
-      const candleW = 6;
       candles.forEach((c, i) => {
-        const x = 60 + i * 10;
-        const bullish = c.close >= c.open;
-        const color = bullish ? '#00D26A' : '#FF3B3B';
-
-        // Wick
-        ctx.strokeStyle = color;
+        const x = 50 + i * 8;
+        const bull = c.c >= c.o;
+        const col = bull ? '#00D26A' : '#FF3B3B';
+        ctx.strokeStyle = col;
         ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(x, yPos(c.high));
-        ctx.lineTo(x, yPos(c.low));
-        ctx.stroke();
-
-        // Body
-        ctx.fillStyle = color;
-        const bodyTop = yPos(Math.max(c.open, c.close));
-        const bodyBot = yPos(Math.min(c.open, c.close));
-        const bodyH = Math.max(bodyBot - bodyTop, 1);
-        ctx.fillRect(x - candleW / 2, bodyTop, candleW, bodyH);
+        ctx.beginPath(); ctx.moveTo(x, yP(c.h)); ctx.lineTo(x, yP(c.l)); ctx.stroke();
+        ctx.fillStyle = col;
+        const bt = yP(Math.max(c.o, c.c));
+        const bb = yP(Math.min(c.o, c.c));
+        ctx.fillRect(x - 2.5, bt, 5, Math.max(bb - bt, 1));
       });
 
-      // Price labels
-      ctx.fillStyle = '#6B6B76';
+      // Y-axis labels
+      ctx.fillStyle = '#50505A';
       ctx.font = '10px Roboto, sans-serif';
-      const steps = 6;
-      for (let i = 0; i <= steps; i++) {
-        const p = minP + (maxP - minP) * (i / steps);
-        const y = yPos(p);
-        ctx.fillText('$' + p.toFixed(0), 4, y + 3);
+      for (let i = 0; i <= 5; i++) {
+        const p = mn + (mx - mn) * (i / 5);
+        ctx.fillText('$' + p.toFixed(0), 2, yP(p) + 3);
       }
 
-      // Current price line
-      const lastClose = candles[candles.length - 1].close;
-      const ly = yPos(lastClose);
+      // Current price
+      const last = candles[candles.length - 1].c;
+      const ly = yP(last);
       ctx.strokeStyle = '#2894F9';
-      ctx.lineWidth = 0.8;
-      ctx.setLineDash([4, 3]);
-      ctx.beginPath();
-      ctx.moveTo(50, ly);
-      ctx.lineTo(W - 10, ly);
-      ctx.stroke();
+      ctx.lineWidth = 0.7;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(45, ly); ctx.lineTo(W - 50, ly); ctx.stroke();
       ctx.setLineDash([]);
 
-      // Price tag
       ctx.fillStyle = '#2894F9';
-      ctx.fillRect(W - 60, ly - 8, 52, 16);
+      const tagW = 48;
+      ctx.fillRect(W - 50, ly - 8, tagW, 16);
       ctx.fillStyle = '#fff';
-      ctx.font = '10px Roboto, sans-serif';
-      ctx.fillText('$' + lastClose.toFixed(1), W - 56, ly + 4);
+      ctx.font = '9px Roboto, sans-serif';
+      ctx.fillText('$' + last.toFixed(1), W - 48, ly + 3);
     }
 
     drawChart();
     window.addEventListener('resize', drawChart);
 
-    /* ── Interactive Tabs ─────────────────────────── */
-    document.querySelectorAll('.date-tabs .date-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.date-tabs .date-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
+    /* ── Tab interactions ─────────────────────────── */
+    function setupTabs(selector) {
+      document.querySelectorAll(selector).forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll(selector).forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+        });
       });
-    });
-    document.querySelectorAll('.asset-toggle .tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.asset-toggle .tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-      });
-    });
-    document.querySelectorAll('.positions-tabs .pos-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.positions-tabs .pos-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-      });
-    });
-    document.querySelectorAll('.chart-toolbar .tf').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.chart-toolbar .tf').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-      });
-    });
+    }
+    setupTabs('.date-bar .date-tab');
+    setupTabs('.asset-toggle .asset-btn');
+    setupTabs('.positions-tabs .pos-tab');
+    setupTabs('.chart-toolbar .tf');
+    setupTabs('.top-nav .nav-tab');
   </script>
 </body>
 </html>
