@@ -10,35 +10,35 @@
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg-base: #101013;
-      --bg-surface: #1A1A1F;
-      --bg-surface-alt: #141418;
-      --bg-elevated: #1E1E24;
-      --bg-header: #0D0D10;
-      --bg-row-hover: #1A1A22;
-      --bg-row-highlight: #1C1C28;
-      --bg-atm: #1E1A14;
-      --bg-itm-call: rgba(0, 210, 106, 0.04);
-      --bg-itm-put: rgba(255, 59, 59, 0.04);
+      --bg-base: #0B0E11;
+      --bg-surface: #151922;
+      --bg-surface-alt: #0F1217;
+      --bg-elevated: #1B1F28;
+      --bg-header: #090B0E;
+      --bg-row-hover: #141820;
+      --bg-row-highlight: #181C25;
+      --bg-atm: #1A1610;
+      --bg-itm-call: rgba(62, 189, 140, 0.05);
+      --bg-itm-put: rgba(242, 54, 69, 0.05);
 
-      --text-primary: #FFFFFF;
-      --text-secondary: #A0A0A8;
-      --text-tertiary: #6B6B76;
-      --text-dim: #50505A;
+      --text-primary: #D1D4DC;
+      --text-secondary: #808690;
+      --text-tertiary: #5E6370;
+      --text-dim: #464A56;
 
-      --accent: #2894F9;
-      --accent-muted: rgba(40, 148, 249, 0.15);
+      --accent: #2A7DE1;
+      --accent-muted: rgba(42, 125, 225, 0.18);
 
-      --buy: #00D26A;
-      --buy-muted: rgba(0, 210, 106, 0.12);
-      --sell: #FF3B3B;
-      --sell-muted: rgba(255, 59, 59, 0.12);
+      --buy: #3EBD8C;
+      --buy-muted: rgba(62, 189, 140, 0.10);
+      --sell: #F23645;
+      --sell-muted: rgba(242, 54, 69, 0.10);
 
-      --border: #2A2A32;
-      --border-subtle: #1E1E26;
-      --border-strong: #3A3A44;
+      --border: #1E2330;
+      --border-subtle: #161A24;
+      --border-strong: #2A3040;
 
-      --warning: #FFB020;
+      --warning: #E5A33A;
 
       --font: "Roboto", "Helvetica", "Arial", sans-serif;
       --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -268,8 +268,10 @@
       color: var(--text-dim);
       margin-top: 0px;
     }
+    .ask-price { background: rgba(62, 189, 140, 0.08) !important; }
     .ask-price .price-line { color: var(--buy); }
     .bid-price-put .price-line { color: var(--buy); }
+    .ask-price-put { background: rgba(242, 54, 69, 0.08) !important; }
     .ask-price-put .price-line { color: var(--sell); }
 
     .oi-val { color: var(--text-tertiary); font-size: 11px; }
@@ -634,11 +636,11 @@
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
 
-      ctx.fillStyle = '#101013';
+      ctx.fillStyle = '#0B0E11';
       ctx.fillRect(0, 0, W, H);
 
       // Grid
-      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.03)';
       ctx.lineWidth = 0.5;
       for (let y = 30; y < H - 20; y += 35) {
         ctx.beginPath(); ctx.moveTo(45, y); ctx.lineTo(W - 50, y); ctx.stroke();
@@ -668,7 +670,7 @@
       candles.forEach((c, i) => {
         const x = 50 + i * 8;
         const bull = c.c >= c.o;
-        const col = bull ? '#00D26A' : '#FF3B3B';
+        const col = bull ? '#3EBD8C' : '#F23645';
         ctx.strokeStyle = col;
         ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(x, yP(c.h)); ctx.lineTo(x, yP(c.l)); ctx.stroke();
@@ -679,7 +681,7 @@
       });
 
       // Y-axis labels
-      ctx.fillStyle = '#50505A';
+      ctx.fillStyle = '#464A56';
       ctx.font = '10px Roboto, sans-serif';
       for (let i = 0; i <= 5; i++) {
         const p = mn + (mx - mn) * (i / 5);
@@ -689,13 +691,13 @@
       // Current price
       const last = candles[candles.length - 1].c;
       const ly = yP(last);
-      ctx.strokeStyle = '#2894F9';
+      ctx.strokeStyle = '#2A7DE1';
       ctx.lineWidth = 0.7;
       ctx.setLineDash([3, 3]);
       ctx.beginPath(); ctx.moveTo(45, ly); ctx.lineTo(W - 50, ly); ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.fillStyle = '#2894F9';
+      ctx.fillStyle = '#2A7DE1';
       const tagW = 48;
       ctx.fillRect(W - 50, ly - 8, tagW, 16);
       ctx.fillStyle = '#fff';
